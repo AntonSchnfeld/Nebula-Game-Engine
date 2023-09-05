@@ -1,11 +1,13 @@
 package renderz.shaderz;
 
+import interfacez.Disposable;
 import util.FileLoader;
 
 import java.util.HashMap;
+
 import static org.lwjgl.opengl.GL30C.*;
 
-public class FragmentShader implements Shader
+public class FragmentShader implements Shader, Disposable
 {
     private final int id;
     private final String src, filePath;
@@ -55,7 +57,7 @@ public class FragmentShader implements Shader
         return newFragment;
     }
 
-    public void delete ()
+    public void dispose ()
     {
         glDeleteShader(id);
         fragmentShaders.remove(filePath);

@@ -1,25 +1,27 @@
 package windowz;
 
+import interfacez.Disposable;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.glfw.*;
+import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
-import org.lwjgl.opengl.GL30C;
 import org.lwjgl.system.MemoryStack;
+import renderz.materialz.EBO;
 import renderz.materialz.VAO;
 import renderz.materialz.VBO;
 import renderz.shaderz.ShaderProgram;
 import renderz.texturez.Texture2D;
 import util.OpenGLUtils;
+import windowz.managerz.KeyListener;
 
 import java.nio.IntBuffer;
-import java.util.Arrays;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL30C.*;
 import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
-public class Window
+public class Window implements Disposable
 {
     private ShaderProgram defaultShader;
     private long windowObject;
@@ -52,6 +54,7 @@ public class Window
         glfwDefaultWindowHints(); // optional, the current window hints are already the default
         glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE); // the window will stay hidden after creation
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be non-resizable
+        glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 
         // Create the window
         windowObject = glfwCreateWindow(width, height, title, NULL, NULL);
@@ -74,7 +77,8 @@ public class Window
             glfwSetWindowPos(windowObject, (vidMode.width() - pWidth.get(0)) / 2, (vidMode.height() - pHeight.get(0)) / 2);
         } // the stack frame is popped automatically
 
-        glfwSetFramebufferSizeCallback(windowObject, new WindowResizeCallback());
+        glfwSetFramebufferSizeCallback(windowObject, WindowResizeListener.getInstance());
+        glfwSetKeyCallback(windowObject, KeyListener.getInstance());
 
         // Make the OpenGL context current
         glfwMakeContextCurrent(windowObject);
@@ -87,6 +91,8 @@ public class Window
         // creates the GLCapabilities instance, and makes the OpenGL
         // bindings available for use.
         GL.createCapabilities();
+
+        System.out.println("Hello Nebula! Using OpenGL version: "+glGetString(GL_VERSION));
 
         glfwShowWindow(windowObject);
     }
@@ -105,37 +111,52 @@ public class Window
 
     public void loop ()
     {
-        defaultShader = ShaderProgram.getDefaultShaderProgram();
         ShaderProgram testShader = ShaderProgram.createShaderProgram("assets\\triangle.vert", "assets\\triangle.frag");
 
-        Texture2D texture2D = new Texture2D("assets\\nebula.png");
         try {
 
             camera = new Camera2D(0, 0);
 
             float[] vertices = {
-                    //X       Y       Z
-                    -75, 75, 0.0f,  //Top left
-                    75, 75f, 0.0f, //Top right
-                    75, -75, 0.0f,  //Bottom right
-                    -75, -75, 0.0f    //Bottom left
+                  //X       Y       Z
+                    -0.5f,  0.5f,   0f, // Top Left
+                    0.5f,   0.5f,   0f, // Top Right
+                    -0.5f,  -0.5f,  0f, // Bottom Left
+                    0.5f,  -0.5f,   0f  // Bottom Right
             };
-
-
-            float[] colorArr = {
-                  //R  G  B  A
-                    1, 0, 0, 1,
-                    0, 1, 0, 1,
-                    0, 0, 1, 1,
-                    0.5f, 1, 0.5f, 1
+            
+            float[] colors = {
+                  //R       G       B       A
+                    1f,     1f,     1f,     1f, // Top Left
+                    1f,     1f,     1f,     1f, // Top Right
+                    1f,     1f,     1f,     1f, // Bottom Left
+                    1f,     1f,     1f,     1f  // Bottom Right
             };
 
             float[] uvs = {
-                    0, 1,
-                    1, 1,
                     1, 0,
-                    0, 0
+                    0, 0,
+                    1, 1,
+                    0, 1
             };
+
+            int[] indices = {
+                    0, 3, 2,
+                    1, 0, 3
+            };
+
+            Texture2D tex = Texture2D.createTexture2D("assets/goldenBricks.png");
+
+            VAO vao = new VAO();
+            vao.bind();
+            EBO ebo = new EBO(indices, 3);
+            ebo.bind();
+            VBO vertexVBO = new VBO(vertices, 3);
+            VBO colorVBO = new VBO(colors, 4);
+            VBO uvVBO = new VBO(uvs, 2);
+            vao.vertexAttribPtr(vertexVBO, 0);
+            vao.vertexAttribPtr(colorVBO, 1);
+            vao.vertexAttribPtr(uvVBO, 2);
 
             IntBuffer screenWidth = BufferUtils.createIntBuffer(4), screenHeight = BufferUtils.createIntBuffer(4);
 
@@ -146,33 +167,25 @@ public class Window
             long now = System.currentTimeMillis();
             long another = System.currentTimeMillis();
 
-            int error;
+            int error = 0;
 
-            testShader.use();
-
-            VAO vao = new VAO();
-            VBO positionVBO = new VBO(vertices, 3, GL_STATIC_DRAW);
-            VBO colorVBO = new VBO(colorArr, 4, GL_STATIC_DRAW);
-            vao.enableAttribute(positionVBO, 0);
-            vao.enableAttribute(colorVBO, 1);
-
-            OpenGLUtils.checkForException();
-
-            vao.bind();
-            testShader.use();
+            int frame = 0;
 
             while (!glfwWindowShouldClose(windowObject)) {
                 moveCamera();
+                frame++;
+
+                error = Math.max(glGetError(), error);
 
                 // Prints camera position every second
                 now = System.currentTimeMillis();
-                System.out.print("\r Current Camera Position: X: " + camera.position.x + " Y: " + camera.position.y +
-                            " | Rendering time: "+(now-another)+ " ms");
+                System.out.print("\rCurrent Camera Position: X: " + camera.position.x + " Y: " + camera.position.y +
+                            " | Rendering time: "+(now-another)+ " ms | frame: "+frame + " | Error code: "+OpenGLUtils.getErrorCodeMessage(error) + " " + error);
 
                 another = System.currentTimeMillis();
 
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
-                glClearColor(0.5f, 0.5f, 0.5f, 1f);
+                glClearColor(0f, 0, 0, 1f);
                 glfwGetFramebufferSize(windowObject, screenWidth, screenHeight);
 
                 screenWidth.clear();
@@ -183,59 +196,74 @@ public class Window
 
                 glViewport(0, 0, width, height);
 
-                testShader.uploadMat4f("aView", camera.getViewMatrix());
-                testShader.uploadMat4f("aProjection", camera.getProjectionMatrix());
+                vao.bind();
+                testShader.bind();
+                tex.use(1);
+                testShader.uploadUniformTexture2D("texture_1", 1);
+                testShader.uploadUniform1f("texture_id", 1);
+                vao.enableAttribute(0);
+                vao.enableAttribute(1);
+                vao.enableAttribute(2);
+                glDrawElements(GL_TRIANGLES, indices.length, GL_UNSIGNED_INT, 0);
+                OpenGLUtils.checkForException();
+                vao.disableAttribute(0);
+                vao.disableAttribute(1);
+                vao.disableAttribute(2);
+                vao.unbind();
+                glUseProgram(0);
+                OpenGLUtils.checkForException();
 
-                glDrawArrays(GL_QUADS, 0, 4);
-
-                // Draw Background
-
-                glfwSwapBuffers(windowObject); // swap the color buffers
+                glfwSwapBuffers(windowObject);
 
                 // Poll for window events. The key callback above will only be invoked during this call.
                 glfwPollEvents();
 
-
                 OpenGLUtils.checkForException();
             }
+
+            tex.dispose();
+            vao.dispose();
+            colorVBO.dispose();
+            vertexVBO.dispose();
+            uvVBO.dispose();
+            ebo.dispose();
+
         }
         catch (Exception e)
         {
             e.printStackTrace();
         }
-        finally {
-
-            texture2D.delete();
-            testShader.delete();
-            delete();
+        finally
+        {
+            testShader.dispose();
+            dispose();
         }
     }
 
     private void moveCamera ()
     {
         final int camSpeed = 5;
-        if (glfwGetKey(windowObject, GLFW_KEY_A) == GLFW_PRESS)
+        if (KeyListener.isKeyPressed(GLFW_KEY_A))
         {
             camera.position.x -= camSpeed;
         }
-        else if (glfwGetKey(windowObject, GLFW_KEY_D) == GLFW_PRESS)
+        else if (KeyListener.isKeyPressed(GLFW_KEY_D))
         {
             camera.position.x += camSpeed;
         }
-        if (glfwGetKey(windowObject, GLFW_KEY_W) == GLFW_PRESS)
+        if (KeyListener.isKeyPressed(GLFW_KEY_W))
         {
             camera.position.y += camSpeed;
         }
-        else if (glfwGetKey(windowObject, GLFW_KEY_S) == GLFW_PRESS)
+        else if (KeyListener.isKeyPressed(GLFW_KEY_S))
         {
             camera.position.y -= camSpeed;
         }
     }
 
-    private void delete ()
+    public void dispose ()
     {
         glfwDestroyWindow(windowObject);
-        defaultShader.delete();
         glfwTerminate();
     }
 

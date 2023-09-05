@@ -1,28 +1,30 @@
 package renderz.texturez;
 
+import interfacez.Disposable;
 import org.lwjgl.BufferUtils;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.util.HashMap;
 
-import static org.lwjgl.stb.STBImage.*;
 import static org.lwjgl.opengl.GL30C.*;
+import static org.lwjgl.stb.STBImage.stbi_image_free;
+import static org.lwjgl.stb.STBImage.stbi_load;
 
 /**
  * The <code>renderz.texturez.Texture2D</code> class is meant to abstract over two-dimensional textures in <code>OpenGL</code>
  */
-public class Texture2D
+public class Texture2D implements Disposable
 {
+    private static final HashMap<String, Texture2D> textures = new HashMap<>();
     private final int id; // Texture id for OpenGL operations
     private final IntBuffer width, height; // Width and height of image
-    private final IntBuffer nrChannels;
 
     /**
      * Constructs a new mipmapped <code>renderz.texturez.Texture2D</code> object.
      * @param filepath the path to the image file
-     * @param alpha if the image has alpha
      */
-    public Texture2D(String filepath)
+    private Texture2D(String filepath)
     {
         id = glGenTextures();
         glBindTexture(GL_TEXTURE_2D, id);
@@ -36,13 +38,14 @@ public class Texture2D
         // load and generate the texture
         width = BufferUtils.createIntBuffer(1);
         height = BufferUtils.createIntBuffer(1);
-        nrChannels = BufferUtils.createIntBuffer(1);
+        IntBuffer nrChannels = BufferUtils.createIntBuffer(1);
         ByteBuffer data = stbi_load(filepath, width, height, nrChannels, 4);
 
         if (data != null)
         {
             final int colorMode = GL_RGBA;
 
+            data.flip();
             glTexImage2D(GL_TEXTURE_2D, 0, colorMode, width.get(), height.get(), 0, colorMode, GL_UNSIGNED_BYTE, data);
             stbi_image_free(data);
         }
@@ -90,8 +93,20 @@ public class Texture2D
     /**
      * Deletes the <code>renderz.texturez.Texture2D</code> from the <code>GPU</code>
      */
-    public void delete ()
+    public void dispose ()
     {
         glDeleteTextures(id);
+    }
+
+    public static Texture2D createTexture2D (String filePath)
+    {
+        if (textures.containsKey(filePath))
+        {
+            return textures.get(filePath);
+        }
+
+        Texture2D newTexture = new Texture2D(filePath);
+        textures.put(filePath, newTexture);
+        return newTexture;
     }
 }

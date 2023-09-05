@@ -1,0 +1,45 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="learnLWJGL:jar2">
+    <output-path>$PROJECT_DIR$/out/artifacts/learnLWJGL_jar2</output-path>
+    <root id="archive" name="learnLWJGL.jar">
+      <element id="module-output" name="learnLWJGL" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/nebula-lwjgl-3.2.2/lwjgl.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/nebula-lwjgl-3.2.2/lwjgl-nfd.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/nebula-lwjgl-3.2.2/lwjgl-stb.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/nebula-lwjgl-3.2.2/lwjgl-glfw.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/nebula-lwjgl-3.2.2/lwjgl-zstd.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/nebula-lwjgl-3.2.2/joml-1.10.5.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/nebula-lwjgl-3.2.2/lwjgl-openal.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/nebula-lwjgl-3.2.2/lwjgl-opengl.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/nebula-lwjgl-3.2.2/lwjgl-javadoc.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/nebula-lwjgl-3.2.2/lwjgl-sources.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/nebula-lwjgl-3.2.2/lwjgl3-awt-0.1.8.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/nebula-lwjgl-3.2.2/lwjgl-nfd-javadoc.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/nebula-lwjgl-3.2.2/lwjgl-nfd-sources.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/nebula-lwjgl-3.2.2/lwjgl-stb-javadoc.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/nebula-lwjgl-3.2.2/lwjgl-stb-sources.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/nebula-lwjgl-3.2.2/lwjgl-glfw-javadoc.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/nebula-lwjgl-3.2.2/lwjgl-glfw-sources.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/nebula-lwjgl-3.2.2/lwjgl-zstd-javadoc.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/nebula-lwjgl-3.2.2/lwjgl-zstd-sources.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/nebula-lwjgl-3.2.2/joml-1.10.5-javadoc.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/nebula-lwjgl-3.2.2/joml-1.10.5-sources.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/nebula-lwjgl-3.2.2/lwjgl-openal-javadoc.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/nebula-lwjgl-3.2.2/lwjgl-openal-sources.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/nebula-lwjgl-3.2.2/lwjgl-opengl-javadoc.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/nebula-lwjgl-3.2.2/lwjgl-opengl-sources.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/nebula-lwjgl-3.2.2/lwjgl-natives-windows.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/nebula-lwjgl-3.2.2/lwjgl3-awt-0.1.8-javadoc.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/nebula-lwjgl-3.2.2/lwjgl3-awt-0.1.8-sources.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/nebula-lwjgl-3.2.2/lwjgl-nfd-natives-windows.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/nebula-lwjgl-3.2.2/lwjgl-stb-natives-windows.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/nebula-lwjgl-3.2.2/lwjgl-glfw-natives-windows.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/nebula-lwjgl-3.2.2/lwjgl-zstd-natives-windows.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/nebula-lwjgl-3.2.2/lwjgl-openal-natives-windows.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/nebula-lwjgl-3.2.2/lwjgl-opengl-natives-windows.jar" path-in-jar="/" />
+      <element id="directory" name="assets">
+        <element id="dir-copy" path="$PROJECT_DIR$/assets" />
+      </element>
+    </root>
+  </artifact>
+</component>

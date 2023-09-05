@@ -1,12 +1,13 @@
 package renderz.shaderz;
 
+import interfacez.Disposable;
 import util.FileLoader;
 
 import java.util.HashMap;
 
 import static org.lwjgl.opengl.GL30C.*;
 
-public class VertexShader implements Shader
+public class VertexShader implements Shader, Disposable
 {
     private final String src, filePath;
     private final int id;
@@ -34,7 +35,7 @@ public class VertexShader implements Shader
         return id;
     }
 
-    public void delete ()
+    public void dispose ()
     {
         glDeleteShader(id);
         vertexShaders.remove(filePath);

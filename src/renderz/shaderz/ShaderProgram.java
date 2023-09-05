@@ -1,14 +1,15 @@
 package renderz.shaderz;
 
+import interfacez.Bindable;
+import interfacez.Disposable;
 import org.joml.Matrix4f;
-import org.lwjgl.BufferUtils;
 
 import java.util.HashMap;
 
 import static org.lwjgl.opengl.GL30C.*;
 
 
-public class ShaderProgram
+public class ShaderProgram implements Disposable, Bindable
 {
     private static ShaderProgram boundShader;
     private final FragmentShader fragment;
@@ -18,10 +19,10 @@ public class ShaderProgram
     private String key;
 
     private final static HashMap<String, ShaderProgram> shaderPrograms = new HashMap<>();
-    private final static ShaderProgram defaultProgram = new ShaderProgram("assets\\normVertex.glsl", "assets\\normFragment.glsl");
+    private final static ShaderProgram defaultProgram = new ShaderProgram("assets/default.vert", "assets/default.frag");
     static
     {
-        shaderPrograms.put("normVertex.glsl"+"normFragment.glsl", defaultProgram);
+        shaderPrograms.put(defaultProgram.key, defaultProgram);
     }
 
     private ShaderProgram (VertexShader vertex, FragmentShader fragment)
@@ -76,18 +77,25 @@ public class ShaderProgram
             throw new ShaderLinkException(errorMessage);
         }
 
-        vertex.delete();
-        fragment.delete();
+        vertex.dispose();
+        fragment.dispose();
     }
 
-    public void use ()
+    public void bind ()
     {
         glUseProgram(id);
         boundShader = this;
     }
 
-    public void delete ()
+    public void unbind ()
     {
+        if (boundShader == this) boundShader = null;
+        glUseProgram(0);
+    }
+
+    public void dispose ()
+    {
+        if (boundShader == this) boundShader = null;
         glDeleteProgram(id);
         shaderPrograms.remove(key);
     }
@@ -99,7 +107,7 @@ public class ShaderProgram
             return uniformPositions.get(uniform);
         }
 
-        use();
+        bind();
         final int loc = glGetUniformLocation(id, uniform);
         uniformPositions.put(uniform, loc);
         return loc;
@@ -117,7 +125,7 @@ public class ShaderProgram
         glUniform1i(loc, value);
     }
 
-    public void uploadTexture2D (String uniform, int slot)
+    public void uploadUniformTexture2D (String uniform, int slot)
     {
         final int loc = getUniformLocation(uniform);
         glUniform1i(loc, slot);
@@ -126,7 +134,7 @@ public class ShaderProgram
     public void uploadMat4f(String uniform, Matrix4f value)
     {
         int loc = getUniformLocation(uniform);
-        glUniformMatrix4fv(loc, false, BufferUtils.createFloatBuffer(16));
+        glUniformMatrix4fv(loc, false, value.get(new float[16]));
     }
 
     public static ShaderProgram createShaderProgram (String vertexFilePath, String fragmentFilePath)
