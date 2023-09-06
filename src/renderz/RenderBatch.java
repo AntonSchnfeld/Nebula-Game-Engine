@@ -113,7 +113,7 @@ public class RenderBatch
 
     private void addVertex (float[] vertex)
     {
-        int index = vertexCount;
+        int index = vertexCount * VERTEX_SIZE;
 
         // Position
         vertices[index++] = vertex[0];
@@ -139,10 +139,17 @@ public class RenderBatch
     private void deleteVertex (int index)
     {
         // TODO: Add some sort of way to actually delete array elements and move all other vertices behind that by VERTEX_SIZE
-        for (int i = 0; i < VERTEX_SIZE; i++)
+
+        int elementsToDelete = Math.min(VERTEX_SIZE, vertices.length - index);
+
+        System.arraycopy(vertices, index + elementsToDelete, vertices, index, vertices.length - index - elementsToDelete);
+
+        for (int i = vertices.length - elementsToDelete; i < vertices.length; i++)
         {
-            vertices[index + i] = 0;
+            vertices[i] = 0.0f;
         }
+
+        vertexCount--;
     }
 
     public void removeRenderComponent (RenderComponent rc)
@@ -155,6 +162,8 @@ public class RenderBatch
         {
             deleteVertex(index * SHAPE.VERTEX_COUNT * VERTEX_SIZE);
         }
+
+        RENDER_COMPONENTS.remove(rc);
     }
 
     public void addRenderComponent (RenderComponent rc)
@@ -176,5 +185,10 @@ public class RenderBatch
             // (i + 1) * VERTEX_SIZE gets its end
             addVertex(Arrays.copyOfRange(rc.getVertices(), i * VERTEX_SIZE, (i + 1) * VERTEX_SIZE));
         }
+    }
+
+    public float[] getVertices ()
+    {
+        return vertices;
     }
 }
