@@ -2,14 +2,14 @@ package entitiez.componentz;
 
 import entitiez.Component;
 import entitiez.Transform;
-import renderz.Shape;
+import renderz.materialz.ShapeType;
 
 public class RenderComponent extends Component
 {
     private Sprite sprite;
     private float[] vertices;
     private Transform transform;
-    private Shape shape;
+    private ShapeType shapeType;
 
     public RenderComponent (Sprite sprite)
     {

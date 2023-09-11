@@ -1,6 +1,8 @@
 package renderz;
 
 import entitiez.componentz.RenderComponent;
+import renderz.materialz.ShapeType;
+import renderz.shaderz.ShaderProgram;
 import renderz.texturez.Texture2D;
 
 import java.util.ArrayList;
@@ -29,7 +31,7 @@ public class RenderBatch
     private static final int TEXTURE_ID_SIZE = 1;
     private static final int TEXTURE_ID_SIZE_BYTES = TEXTURE_ID_SIZE * Float.BYTES;
     private static final int VERTEX_OFFSET = TEXTURE_ID_OFFSET + TEXTURE_ID_SIZE_BYTES;
-    private static final int VERTEX_SIZE = POSITION_SIZE + COLOUR_SIZE + UV_SIZE + TEXTURE_ID_SIZE;
+    public static final int VERTEX_SIZE = POSITION_SIZE + COLOUR_SIZE + UV_SIZE + TEXTURE_ID_SIZE;
     private static final int VERTEX_SIZE_BYTES = VERTEX_SIZE * Float.BYTES;
 
     private static final int TEXTURE_COUNT = 10;
@@ -41,11 +43,12 @@ public class RenderBatch
     private float[] vertices;
     private final List<RenderComponent> RENDER_COMPONENTS;
     private final List<Texture2D> TEXTURES;
-    private final Shape SHAPE;
+    private final ShapeType SHAPEType;
+    private static final ShaderProgram program = ShaderProgram.getDefaultShaderProgram();
 
-    public RenderBatch (int maxBatchSize, Shape shape)
+    public RenderBatch (int maxBatchSize, ShapeType shapeType)
     {
-        this.SHAPE = shape;
+        this.SHAPEType = shapeType;
         this.MAX_BATCHSIZE = maxBatchSize;
         this.vertexCount = 0;
 
@@ -53,8 +56,8 @@ public class RenderBatch
         this.VBO = glGenBuffers();
         this.EBO = glGenBuffers();
 
-        this.vertices = new float[shape.VERTEX_COUNT * VERTEX_SIZE * maxBatchSize];
-        this.indices = new int[maxBatchSize * shape.INDEX_COUNT];
+        this.vertices = new float[shapeType.VERTEX_COUNT * VERTEX_SIZE * maxBatchSize];
+        this.indices = new int[maxBatchSize * shapeType.INDEX_COUNT];
 
         generateIndices();
 
@@ -68,15 +71,15 @@ public class RenderBatch
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices, GL_DYNAMIC_DRAW);
     }
 
-    public RenderBatch (Shape shape)
+    public RenderBatch (ShapeType shapeType)
     {
-        this(DEFAULT_BATCH_SIZE, shape);
+        this(DEFAULT_BATCH_SIZE, shapeType);
     }
 
     private void generateIndices ()
     {
         // If this is a QUAD based renderer, generate Quad indices
-        if (SHAPE == Shape.QUADS)
+        if (SHAPEType == ShapeType.QUADS)
         {
             int arrayIndex = 0;
             int indexOffset;
@@ -103,7 +106,7 @@ public class RenderBatch
 
     public boolean hasRoom ()
     {
-        return vertexCount < MAX_BATCHSIZE * SHAPE.VERTEX_COUNT;
+        return vertexCount < MAX_BATCHSIZE * SHAPEType.VERTEX_COUNT;
     }
 
     public boolean hasTextureRoom ()
@@ -158,9 +161,9 @@ public class RenderBatch
 
         int index = RENDER_COMPONENTS.indexOf(rc);
 
-        for (int i = 0; i < SHAPE.VERTEX_COUNT; i++)
+        for (int i = 0; i < SHAPEType.VERTEX_COUNT; i++)
         {
-            deleteVertex(index * SHAPE.VERTEX_COUNT * VERTEX_SIZE);
+            deleteVertex(index * SHAPEType.VERTEX_COUNT * VERTEX_SIZE);
         }
 
         RENDER_COMPONENTS.remove(rc);
@@ -178,12 +181,39 @@ public class RenderBatch
 
         RENDER_COMPONENTS.add(rc);
 
-        for (int i = 0; i < SHAPE.VERTEX_COUNT; i++)
+        for (int i = 0; i < SHAPEType.VERTEX_COUNT; i++)
         {
             // Get sub array of a single vertex and pass it into addVertex
             // i * VERTEX_SIZE gets the start of the next vertex
             // (i + 1) * VERTEX_SIZE gets its end
             addVertex(Arrays.copyOfRange(rc.getVertices(), i * VERTEX_SIZE, (i + 1) * VERTEX_SIZE));
+        }
+    }
+
+    public void render ()
+    {
+        bindTextures();
+
+        program.bind();
+
+        glBindVertexArray(VAO);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+        glDrawElements(SHAPEType.GL_DRAW_MODE, indices.length, GL_UNSIGNED_INT, 0);
+
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
+
+        program.unbind();
+    }
+
+    private void bindTextures ()
+    {
+        for (int i = 0; i < TEXTURE_COUNT; i++)
+        {
+            TEXTURES.get(i).use(i);
         }
     }
 
