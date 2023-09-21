@@ -1,37 +1,48 @@
 package renderz.materialz;
 
-import org.joml.Vector2f;
-import org.joml.Vector3f;
-import org.joml.Vector4f;
-import renderz.RenderBatch;
+import entitiez.Transform;
 
 public class Point implements Shape
 {
     private float[] vertices;
+    private float width, height;
 
-    public Point (Vector3f position, Vector4f color, Vector2f uv, float texID)
+    public Point (Transform transform)
     {
-        this(position.x, position.y, position.z, color.x, color.y, color.z, color.w, uv.x, uv.y, texID);
+        this(transform.getPosition().x, transform.getPosition().y, transform.getPosition().z, transform.getScale().x, transform.getScale().y);
     }
 
-    public Point (float x, float y, float z, float r, float g, float b, float a, float u, float v, float texID)
+    public Point (float x, float y, float z, float width, float height)
     {
+        this.height = height;
+        this.width = width;
         vertices = new float[]
                 {
-                        x, y, z, r, g, b, a, u, v, texID
+                        x, y, z
                 };
     }
 
     @Override
     public void setVertices (float[] vertices)
     {
-        if (vertices.length == RenderBatch.VERTEX_SIZE)
+        if (vertices.length == 3)
         {
             this.vertices = vertices;
             return;
         }
 
-        throw new IllegalArgumentException("Point vertex can only be "+(RenderBatch.VERTEX_SIZE * ShapeType.POINTS.VERTEX_COUNT)+" indices long");
+        throw new IllegalArgumentException("Point vertex can only be "+ (3)+" indices long");
+    }
+
+    @Override
+    public void setVertices(Transform transform)
+    {
+        this.width = transform.getScale().x;
+        this.height = transform.getScale().y;
+
+        vertices[0] = transform.getPosition().x;
+        vertices[1] = transform.getPosition().y;
+        vertices[2] = transform.getPosition().z;
     }
 
     @Override

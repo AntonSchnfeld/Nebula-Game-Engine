@@ -19,13 +19,13 @@ public class RenderBatch
 
     private static final int DEFAULT_BATCH_SIZE = 1000;
     private static final int POSITION_OFFSET = 0;
-    private static final int POSITION_SIZE = 3;
+    public static final int POSITION_SIZE = 3;
     private static final int POSITION_SIZE_BYTES = POSITION_SIZE * Float.BYTES;
-    private static final int COLOUR_OFFSET = POSITION_OFFSET + POSITION_SIZE_BYTES;
-    private static final int COLOUR_SIZE = 4;
+    public static final int COLOUR_OFFSET = POSITION_OFFSET + POSITION_SIZE_BYTES;
+    public static final int COLOUR_SIZE = 4;
     private static final int COLOUR_SIZE_BYTES = COLOUR_SIZE * Float.BYTES;
     private static final int UV_OFFSET = COLOUR_OFFSET + COLOUR_SIZE_BYTES;
-    private static final int UV_SIZE = 2;
+    public static final int UV_SIZE = 2;
     private static final int UV_SIZE_BYTES = UV_SIZE * Float.BYTES;
     private static final int TEXTURE_ID_OFFSET = UV_OFFSET + UV_SIZE_BYTES;
     private static final int TEXTURE_ID_SIZE = 1;

@@ -17,11 +17,6 @@ public abstract class Scene implements Updateable, Starteable, Disposable
         this.entities = new CopyOnWriteArrayList<>();
     }
 
-    public void init ()
-    {
-
-    }
-
     public void start ()
     {
         for (Entity entity : entities)

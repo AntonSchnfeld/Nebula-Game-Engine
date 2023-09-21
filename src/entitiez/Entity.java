@@ -3,6 +3,7 @@ package entitiez;
 import interfacez.Disposable;
 import interfacez.Starteable;
 import interfacez.Updateable;
+import renderz.materialz.*;
 
 import java.util.List;
 import java.util.Objects;
@@ -14,9 +15,21 @@ public class Entity implements Updateable, Starteable, Disposable
     private Transform transform;
     private String name;
     private boolean started;
+    private Shape shape;
 
     public Entity (String name, Transform transform)
     {
+        this(name, transform, ShapeType.QUADS);
+    }
+
+    public Entity (String name, Transform transform, ShapeType shape)
+    {
+        switch (shape)
+        {
+            case QUADS -> this.shape = new Quad(transform);
+            case TRIANGLES -> this.shape = new Triangle(transform);
+            case POINTS -> this.shape = new Point(transform);
+        }
         this.components = new CopyOnWriteArrayList<>();
         this.transform = transform;
         this.name = name;

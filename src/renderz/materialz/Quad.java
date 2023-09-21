@@ -1,56 +1,56 @@
 package renderz.materialz;
 
-import org.joml.Vector2f;
-import org.joml.Vector3f;
-import org.joml.Vector4f;
-import renderz.RenderBatch;
+import entitiez.Transform;
 
 public class Quad implements Shape
 {
     private float[] vertices;
 
-    private static final float[] DEFAULT_UVS = {
-            1, 0,
-            0, 0,
-            1, 1,
-            0, 1
-    };
-
-    public Quad (float x, float y, float z, float width, float height, float r, float g, float b, float a, float[] uvs, float texID)
+    public Quad (float x, float y, float z, float width, float height)
     {
         vertices = new float[]
                 {
-                        x, y, z, r, g, b, a, uvs[0], uvs[1], texID,
-                        x+width, y, z, r, g, b, a, uvs[2], uvs[3], texID,
-                        x, y+height, z, r, g, b, a, uvs[4], uvs[5], texID,
-                        x+width, y+height, z, r, g, b, a, uvs[6], uvs[7], texID
+                        x, y, z,
+                        x+width, y, z,
+                        x, y+height, z,
+                        x+width, y+height, z
                 };
     }
 
-    public Quad (Vector3f position, Vector2f scale, Vector4f color, float[] uvs, float texID)
+    public Quad (Transform transform)
     {
-        this(position.x, position.y, position.z, scale.x, scale.y, color.x, color.y, color.z, color.w, uvs, texID);
-    }
-
-    public Quad (Vector3f position, Vector2f scale, Vector4f color, float texID)
-    {
-        this(position, scale, color, DEFAULT_UVS, texID);
-    }
-
-    public Quad (float x, float y, float z, float width, float height, float r, float b, float g, float a, float texID)
-    {
-        this(x, y, z, width, height, r, g, b, a, DEFAULT_UVS, texID);
+        this(transform.getPosition().x, transform.getPosition().y, transform.getPosition().z, transform.getScale().x, transform.getScale().y);
     }
 
     @Override
     public void setVertices (float[] vertices)
     {
-        if (vertices.length == RenderBatch.VERTEX_SIZE * ShapeType.QUADS.VERTEX_COUNT)
+        if (vertices.length == 3 * ShapeType.QUADS.VERTEX_COUNT)
         {
             this.vertices = vertices;
             return;
         }
-        throw new IllegalArgumentException("Quad vertices can only be "+(RenderBatch.VERTEX_SIZE * ShapeType.QUADS.VERTEX_COUNT)+" indices long");
+        throw new IllegalArgumentException("Quad vertices can only be "+(ShapeType.QUADS.VERTEX_COUNT * 3)+" indices long");
+    }
+
+    @Override
+    public void setVertices (Transform transform)
+    {
+        vertices[0] = transform.getPosition().x;
+        vertices[1] = transform.getPosition().y;
+        vertices[2] = transform.getPosition().z;
+
+        vertices[3] = transform.getPosition().x + transform.getScale().x;
+        vertices[4] = transform.getPosition().y;
+        vertices[5] = transform.getPosition().z;
+
+        vertices[6] = transform.getPosition().x;
+        vertices[7] = transform.getPosition().y + transform.getScale().y;
+        vertices[8] = transform.getPosition().z;
+
+        vertices[9] = transform.getPosition().x + transform.getScale().x;
+        vertices[10] = transform.getPosition().y + transform.getScale().y;
+        vertices[11] = transform.getPosition().z;
     }
 
     @Override

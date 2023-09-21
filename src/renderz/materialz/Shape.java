@@ -1,5 +1,7 @@
 package renderz.materialz;
 
+import entitiez.Transform;
+
 public interface Shape
 {
 
@@ -9,6 +11,8 @@ public interface Shape
      * @throws IllegalArgumentException if length of vertices is not equal to getShapeType().VERTEX_COUNT * RenderBatch.VERTEX_SIZE
      */
     void setVertices (float[] vertices);
+
+    void setVertices (Transform transform);
 
     /**
      * Getter

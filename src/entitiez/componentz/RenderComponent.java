@@ -1,31 +1,59 @@
 package entitiez.componentz;
 
 import entitiez.Component;
-import entitiez.Transform;
+import renderz.materialz.Shape;
 import renderz.materialz.ShapeType;
 
 public class RenderComponent extends Component
 {
+    private final Shape shape;
     private Sprite sprite;
     private float[] vertices;
-    private Transform transform;
-    private ShapeType shapeType;
+    private boolean dirty;
 
-    public RenderComponent (Sprite sprite)
+    public RenderComponent (Shape shape, Sprite sprite)
     {
+        this.shape = shape;
         this.sprite = sprite;
-        this.vertices = sprite.getVertices();
+
+        this.vertices = new float[]
+                {
+
+                };
+
+        this.dirty = false;
     }
 
-    public RenderComponent (Sprite sprite, float[] vertices)
+    public synchronized void setVertices (float[] vertices)
     {
-        this.sprite = sprite;
-        this.vertices = vertices;
+        dirty = true;
+        shape.setVertices(vertices);
     }
 
     public Sprite getSprite ()
     {
         return sprite;
+    }
+
+    public synchronized void setSprite (Sprite sprite)
+    {
+        this.sprite = sprite;
+        this.dirty = true;
+    }
+
+    public boolean isDirty ()
+    {
+        return dirty;
+    }
+
+    public void setClean ()
+    {
+        this.dirty = false;
+    }
+
+    public ShapeType getShapeType ()
+    {
+        return shape.getShapeType();
     }
 
     public float[] getVertices ()
@@ -34,35 +62,19 @@ public class RenderComponent extends Component
     }
 
     @Override
-    public boolean equals (Object o)
-    {
-        if (o == null) return false;
-        if (!(o instanceof RenderComponent comp)) return false;
-
-        return comp.sprite.equals(this.sprite);
+    public <T extends Component> T copy() {
+        return null;
     }
 
     @Override
-    @SuppressWarnings("all")
-    public <T extends Component> T copy ()
+    public void dispose()
     {
-        return (T) new RenderComponent(sprite.copy());
-    }
-
-    @Override
-    public void dispose ()
-    {
+        vertices = null;
         sprite.dispose();
     }
 
     @Override
-    public void update (float dt)
-    {
-        this.transform = entity.getTransform().copy();
-    }
-
-    @Override
-    public void start ()
+    public void start()
     {
 
     }
